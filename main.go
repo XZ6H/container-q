@@ -47,6 +47,11 @@ func child(command ...string) {
 	cmd.Stderr = os.Stderr
 
 	must(syscall.Sethostname([]byte("container")))
+	must(syscall.Chroot("./ubuntufs"))
+	// Change directory after chroot
+	must(os.Chdir("./ubuntufs"))
+	// Mount /proc inside container so that `ps` command works
+	must(syscall.Mount("proc", "proc", "proc", 0, ""))
 
 	must(cmd.Run())
 }
