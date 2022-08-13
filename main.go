@@ -26,6 +26,14 @@ func run(command ...string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
+	// Cloneflags is only available in Linux
+	// CLONE_NEWUTS namespace isolates hostname
+	// CLONE_NEWPID namespace isolates processes
+	// CLONE_NEWNS namespace isolates mounts
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+	}
+
 	// Run child using namespaces. The command provided will be executed inside that.
 	must(cmd.Run())
 }
